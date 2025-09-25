@@ -9,3 +9,6 @@ silver : transformed data (normalization standardization cleansing ) to prepare 
 gold : business ready data modeled as star schema \
 ##ETP pipeline diagram \
 ![data_flow_diagram](https://github.com/user-attachments/assets/9def6e03-edeb-4022-a78e-404aa4444d0a) \
+#DATA INTEGRATION MODEL \
+this diagram represents how different tables are related to each other \
+![data_integration](https://github.com/user-attachments/assets/7667a695-ba1c-421d-824d-5cbacc6a035e)
