@@ -11,4 +11,4 @@ gold : business ready data modeled as star schema \
 ![data_flow_diagram](https://github.com/user-attachments/assets/9def6e03-edeb-4022-a78e-404aa4444d0a) \
 #DATA INTEGRATION MODEL \
 this diagram represents how different tables are related to each other \
-![data_integration](https://github.com/user-attachments/assets/7667a695-ba1c-421d-824d-5cbacc6a035e)
+![data_integration](https://github.com/user-attachments/assets/9077e501-b1d9-4577-9b1f-beaee19346c0)
