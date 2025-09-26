@@ -1,0 +1,47 @@
+-- ===========================================================
+-- QUALITY CHECKS SCRIPTS 
+-- ===========================================================
+-- crm_cust_info : 
+--checking for null or duplicate values 
+--expectation : no result 
+select cst_id , count(*) from bronze.crm_cust_info
+group by cst_id 
+having count(*)  > 1 or cst_id is null 
+--checking for unwanted spaces
+--expected no result 
+select cst_firstname --we can check for other columns too 
+from bronze.crm_cust_info
+where cst_firstname != trim(cst_firstname)
+--data standardization and normalization 
+select distinct(cst_gndr)
+from bronze.crm_cust_info
+-- crm_prd_info : 
+select * from bronze.crm_prd_info ; 
+select prd_id , count(*) 
+from bronze.crm_prd_info 
+group by prd_id
+having count(*) > 1 or prd_id is null --we're good 
+--checking for unwanted spaces
+select prd_nm 
+from bronze.crm_prd_info
+where trim(prd_nm)!=  prd_nm ; --we're good 
+--checking for dates
+select prd_start_dt , prd_end_dt
+from bronze.crm_prd_info
+where prd_end_dt < prd_start_dt ; 
+--sales details : 
+select * from bronze.crm_sales_details ; 
+--checking if the sls_prd_key is not valid
+select sls_prd_key from bronze.crm_sales_details
+where sls_prd_key not in (select prd_key from silver.crm_prd_info) --we're good 
+--checking if the sls_cust_id is not  valid
+select sls_cust_id from bronze.crm_sales_details
+where sls_cust_id not in (select cst_id from silver.crm_cust_info ) ; --we're good 
+-- cheking the dates 
+select sls_order_dt , sls_due_dt , sls_ship_dt
+from bronze.crm_sales_details
+where sls_order_dt > 20500101 or sls_due_dt > 20500101 or sls_ship_dt > 20500101 
+or sls_order_dt < 19900101 or sls_due_dt < 19900101 or sls_ship_dt < 19900101 
+--checking for locations 
+select distinct(cntry) 
+from silver.erp_loc_a101
