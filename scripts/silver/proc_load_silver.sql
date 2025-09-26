@@ -1,3 +1,5 @@
+-- this script for creating a procedire that will load data into the silver layer tables
+-- to proc type exec silver.load_silver
 CREATE OR ALTER PROCEDURE silver.load_silver
 AS
 BEGIN
