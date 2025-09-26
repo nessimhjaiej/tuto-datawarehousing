@@ -1,0 +1,66 @@
+
+-- This script is for applying data integrations , renaming and reordering  columns in order to create views for the gold layer 
+------------------------------------------------------
+-- Create Customer Dimension View
+------------------------------------------------------
+create or alter view gold.dim_customer as
+select 
+    ROW_NUMBER() over(order by cst_id ) as customer_key, 
+    a.cst_id as customer_id, 
+    a.cst_key as customer_number, 
+    a.cst_firstname as first_name, 
+    a.cst_lastname as last_name, 
+    case 
+        when a.cst_gndr != 'Unknown' then a.cst_gndr
+        else coalesce(b.gen,'Unknown')
+    end as gender, 
+    c.cntry as country, 
+    b.bdate as birthdate,
+    a.cst_marital_status as marital_status, 
+    a.cst_create_date  as create_date 
+from silver.crm_cust_info a 
+left join silver.erp_cust_az12 b 
+    on (a.cst_key = b.cid) 
+left join silver.erp_loc_a101 c 
+    on (a.cst_key = c.cid);
+
+------------------------------------------------------
+-- Create Product Dimension View
+------------------------------------------------------
+create or alter view gold.dim_product as 
+select 
+    ROW_NUMBER() over (order by a.prd_start_dt, prd_key) as product_key, 
+    a.prd_id as product_id, 
+    a.prd_key as product_number,
+    a.prd_nm as product_name,
+    a.cat_id as category_id, 
+    b.cat as category, 
+    b.subcat as sub_category,
+    b.maintenance as maintenance, 
+    a.prd_cost as cost, 
+    a.prd_line as product_line, 
+    a.prd_start_dt as product_start_date
+from silver.crm_prd_info a 
+left join silver.erp_px_cat_g1v2 b 
+    on (a.cat_id = b.id)
+where a.prd_end_dt is null;
+
+------------------------------------------------------
+-- Create Fact Sales View
+------------------------------------------------------
+create or alter view gold.fact_sales as 
+select 
+    a.sls_ord_num as order_number, 
+    b.customer_key as customer_key, 
+    c.product_key as product_key, 
+    a.sls_order_dt as sales_order_date, 
+    a.sls_ship_dt as sales_ship_date, 
+    a.sls_due_dt as sales_due_dates,  
+    a.sls_sales as sales_amount, 
+    a.sls_quantity as quantity, 
+    a.sls_price as price
+from silver.crm_sales_details a 
+left join gold.dim_customer b 
+    on (a.sls_cust_id = b.customer_id) 
+left join gold.dim_product c 
+    on (a.sls_prd_key = c.product_number);
